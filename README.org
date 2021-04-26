@@ -1,0 +1,221 @@
+#+TITLE: Readme
+
+This is an attempt of bringing to bring to emacs some [[https://github.com/dendronhq/dendron][Dendron]] features hand in
+hand with [[https://github.com/org-roam/org-roam][Org Roam]]
+
+* Disclaimer
+This is a work in progress project in a very early stage. However it is still
+functional and safe to use in your org roam vault.
+
+This code *only works with Org Roam v2* which is currently in public alpha.
+
+As well I'm not an elisp programmer and this is my first code using this
+language. Probably the code is not as efficient or elegant as it could be, but
+feel free to point out improvements or even contribute to them.
+
+* Why?
+In my experience, pure zettelkasten is awesome for academic information, taking
+notes on books, and articles that are full of abstract concepts that don’t
+belong to any category but are inter-linked with other ideas.
+
+However since I work in the IT industry, I take a lot of notes on software and
+software architecture. This kind of information has a clear structure, a
+structure that repeats between information that belongs to an specific context.
+And here zettelkasten in my opinion is not the perfect fit.
+
+I ended up having lots of notes like: data types in Java, data types in c…
+Repeating information in the title to be able to find specific notes.
+
+This kind of note taking is really useful for me, and I think it can be useful
+for others which write about more structured information
+
+This hierarchies helps grouping and branching notes that are strongly connected
+but leaves the concept of atomic note intact, a note that you can still link
+with others that are related. Also, makes finding this references faster among
+all your notes.
+
+In addition, having this little feature set does not get in your way if you want
+to use just zettelkasten.
+
+For this I got hooked on Dendron's concept of note taking but couldn't get used
+to VSCode, so I decided to write some code to have some of its beautiful goodies
+along with the awesome Org Roam features.
+
+You can find more on the hierarchies rationale in the [[https://www.kevinslin.com/notes/3dd58f62-fee5-4f93-b9f1-b0f0f59a9b64.html][blog]] of Dendron’s creator
+
+* Features
+Hierarchies are just filenames separated by dots “.”, each subsequent hierarchy is child from the former. Something like:
+=org.refile= -> refile is child of org
+=org.refile.cfg= -> cfg is child of refile
+
+Each child is a note, so we can have a folder-like structure, but much less rigid.
+
+** Finding and creating notes
+This emulates the Dendron's Lookup. Runing ~org-roam-node-find~ shows hierarchies
+in the minibuffer. If the note does not exist, the input is used to populate a
+new file.
+
+The search list will show notes with the following format:
+
+=this.is.a.hierarchy:Hello World=
+
+Dendroam will truncate the last child of the hierarchy for the file (which is
+indeed the slugified title) and will show the file title instead for better
+readability.
+
+For note creation you don't need to use hypens, dendroam will change spaces for
+hypens for the file name, keeping the title correct:
+
+Writing:
+
+=proj.dendroam.notes on dendroam=
+
+as input will result in:
+
+file: =proj.dendroam.notes-on-dendroam.org=
+
+Note title: =Notes On Dendroam=
+
+Of course you can create notes without any hierarchy as you would normally do
+with Org Roam
+
+[[file:assets/org-roam-find.gif]]
+
+** Refactor hierarchies
+Useful to move group of files to another hierarchy.
+
+- Running ~org-roam-refactor-hierarchy~ will prompt you with the current file
+  hierarchy so you can change it. This will refactor all the notes that share
+  the same hierarchy as well
+- Running ~org-roam-refactor-file~ will do the same as refactor hierarchy command
+  but will change only the current file.
+
+ [[file:assets/org-roam-refactor.gif]]
+
+** Time notes
+Time notes are sub-hierarchies of other notes that indicates the time, you might
+want this notes under different other notes, journal notes are a great example.
+In this case dendroam is integrated with org-roam-dailies, so we can still using the
+current functions:
+
+=journal.daily.2021.04.21=
+
+Or hierarchy where you capture meetings:
+
+=project.customer1.meet.2021.04.21.123020=
+=project.customer2.meet.2021.04.21.183020=
+
+This makes notes easy to sort and easy to find. You can create time notes under
+any other note as well
+
+Scratch notes are other way of looking at time notes. This type of notes are
+just a dump bucket where you want to capture something on the fly. It is nothing
+more than a top-level hierarchy with time:
+
+=scratch.2021.04.21.183020=
+
+Take a look at the example:
+
+[[file:assets/dailies.gif]]
+
+This notes are possible using org-capture through org-roam new capture
+functions, so it is easy to creae new types of time notes.
+
+
+* Configuration
+
+To show hierarchies in the minibuffer you must change the org-roam display
+template:
+
+#+begin_src emacs-lisp
+(setq org-roam-node-display-template "${hierarchy}:${title}")
+#+end_src
+
+In order to populate the title correctly you need to configure org roam capture
+templates like this:
+
+#+begin_src emacs-lisp
+(setq org-roam-capture-templates
+      '(("d" "default" plain
+         "%?"
+         :if-new (file+head "${slug}.org"
+                            "#+title: ${hierarchy-title}\n")
+         :immediate-finish t
+         :unnarrowed t)))
+#+end_src
+
+An example dailies configuration that works with hierarchies:
+
+#+begin_src emacs-lisp
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry
+         "* %?"
+         :if-new (file+head "journal.daily.%<%Y.%m.%d>.org"
+                            "#+title: %<%Y-%m-%d>\n"))))
+#+end_src
+
+To allow scratch notes and time notes you need to configure a new variable
+defined in the dendroam code called ~org-roam-utils-capture-template~, that adds
+more templates:
+
+#+begin_src emacs-lisp
+(setq org-roam-utils-capture-templates
+      '(("t" "Time note" entry
+         "* %?"
+         :if-new (file+head "${current-file}.%<%Y.%m.%d>.org"
+                            "#+title: %<%Y-%m-%d>\n"))
+        ("s" "Scratch note" entry
+         "* %?"
+         :if-new (file+head "scratch.%<%Y.%m.%d.%.%M%S%3N>.org"
+                            "#+title: %<%M%S%3N>\n"))
+        ))
+#+end_src
+
+If you want yo show the current file hierarchy as an initial input when running
+the find command, you can use this function and then bind it to a key
+combination of your choice
+
+#+begin_src emacs-lisp
+(defun org-roam-node-find-initial-input ()
+  (interactive)
+  (org-roam-node-find nil (if (buffer-file-name)
+                         (file-name-base (buffer-file-name))
+                         "")))
+#+end_src
+
+* Install
+An hour ago this was just some lines in my Doom config file. I'm not sure yet
+how to best distribute this package.
+
+As a workaround for now you can just clone the repo and load the file into your
+config:
+
+#+begin_src emacs-lisp
+(load! "<path to dendrom.el file>")
+#+end_src
+
+Note that the code above is for doom emacs, I guess you can have the same effect
+with ~load~ in vanilla emacs as well. All the help you can give me on how to
+distribute the package is really apreciated.
+
+* Future plans
+This code is something I use my self so I plan to keep improving it. This are
+the things I have in my mind now.
+
+*More Dendron features*:
+- Schema support: I'm researching how to best approach this. Using YAML files
+  like dendron does? Not sure about elisp support for YAML. Another option is to
+  use elisp forms to define schemas and then load them. This is open to
+  discussion of course and I would love to know ideas on this if you have any.
+  Feel free to show them.
+- Publishing: Having an easy and integrated way of publishing would be nice. I
+  don't know too much about web technologies so again, help is really
+  apreciated.
+
+We can of course discuss about more dendron features can be useful in org
+roam/emacs context.
+
+*Dendroam specific plans*
+- Try to keep compatibility with org roam, and if possible add compatibility
+  with Dendron so people can use both (of course exporting org to markdown and viceversa)
+- Some improvements to take advantage of the powerful emacs features.
