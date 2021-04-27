@@ -171,7 +171,7 @@ more templates:
         ))
 #+end_src
 
-If you want yo show the current file hierarchy as an initial input when running
+If you want to show the current file hierarchy as an initial input when running
 the find command, you can use this function and then bind it to a key
 combination of your choice
 
@@ -184,11 +184,12 @@ combination of your choice
 #+end_src
 
 * Install
-An hour ago this was just some lines in my Doom config file. I'm not sure yet
-how to best distribute this package.
 
-As a workaround for now you can just clone the repo and load the file into your
-config:
+** Doom Emacs
+
+*** Load from Disk
+
+You can clone the repo and load the file into your config:
 
 #+begin_src emacs-lisp
 (load! "<path to dendrom.el file>")
@@ -197,6 +198,22 @@ config:
 Note that the code above is for doom emacs, I guess you can have the same effect
 with ~load~ in vanilla emacs as well. All the help you can give me on how to
 distribute the package is really apreciated.
+
+*** Load via github recipe
+
+Inside of your ~.doom.d/packages.el~:
+
+#+begin_src emacs-lisp
+(package! dendroam
+  :recipe (:host github :repo "vicrdguez/dendroam" :branch "main"))
+#+end_src
+
+This registers ~dendroam~ as a package to use in doom. Now inside of ~.doom.d/config.el~:
+
+#+begin_src emacs-lisp
+(use-package! dendroam
+  :after org)
+#+end_src
 
 * Future plans
 This code is something I use my self so I plan to keep improving it. This are
