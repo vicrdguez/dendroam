@@ -3,6 +3,9 @@
 This is an attempt of bringing to bring to emacs some [[https://github.com/dendronhq/dendron][Dendron]] features hand in
 hand with [[https://github.com/org-roam/org-roam][Org Roam]]
 
+*Make sure you check the our [[https://github.com/vicrdguez/dendroam/discussions][Discussions page]] 
+where we can talk about proposals and improvements for the project*
+
 * Disclaimer
 This is a work in progress project in a very early stage. However it is still
 functional and safe to use in your org roam vault.
