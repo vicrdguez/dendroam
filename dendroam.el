@@ -37,11 +37,11 @@
 or sratch notes")
 
 ;;Node custom getters
-(cl-defmethod org-roam-node-current-file (node)
+(cl-defmethod dendroam-node-current-file (node)
   "Gets node file-name-base by file name"
   (file-name-base (org-roam-node-file node)))
 
-(cl-defmethod org-roam-node-hierarchy-title (node)
+(cl-defmethod dendroam-node-hierarchy-title (node)
   "Gets node title excluding the hierarchy and capitalize it"
   (capitalize
    (car
@@ -50,7 +50,7 @@ or sratch notes")
       (org-roam-node-title node)
       "\\.")))))
 
-(defun org-roam-format-hierarchy (file)
+(defun dendroam-format-hierarchy (file)
   "Formats node's path, to get the hierarchy whithout the title
 where title will be the last child of the hierarchy:
 from the filename this.is.a.hierarchy.note-title.org
@@ -59,16 +59,16 @@ returns this.is.a.hierarchy"
          (hierarchy-no-title (file-name-base base-name)))
     hierarchy-no-title))
 
-(cl-defmethod org-roam-node-hierarchy (node)
+(cl-defmethod dendroam-node-hierarchy (node)
   "Gets node hierarchy by file name"
-  (funcall 'org-roam-format-hierarchy (org-roam-node-file node)))
+  (funcall 'dendroam-format-hierarchy (org-roam-node-file node)))
 
-(cl-defmethod org-roam-node-current-file (node)
+(cl-defmethod dendroam-node-current-file (node)
   (file-name-base (buffer-file-name)))
 
 ;; Refactor functions
 
-(defun org-roam-fetch-same-hierarchy-files (hierarchy)
+(defun dendroam-fetch-same-hierarchy-files (hierarchy)
   "Gets all the nodes that share the same HIERARCHY totally or parcially"
   (let ((files
          (mapcar #'car (org-roam-db-query [:select [file]
@@ -77,7 +77,7 @@ returns this.is.a.hierarchy"
                                           (concat "%" hierarchy "%")))))
     files))
 
-(defun org-roam-refactor-hierarchy (&optional current)
+(defun dendroam-refactor-hierarchy (&optional current)
   "Prompts the user to change the hierarchy of the current file
 node and updates its hierarchy and the hierarchy of all the nodes
 that have it if CURRENT is t the list of updated files is just
@@ -94,7 +94,7 @@ the current file"
         (file-name-base initial-slug))
        (files-to-upd (if current
                          `(,initial-file)
-                       (org-roam-fetch-same-hierarchy-files
+                       (dendroam-fetch-same-hierarchy-files
                         initial-slug-no-title))))
 
     (dolist (file files-to-upd)
@@ -106,7 +106,7 @@ the current file"
               (kill-current-buffer)
               (find-file new-file)))))))
 
-(defun org-roam-refactor-file ()
+(defun dendroam-refactor-file ()
   (interactive)
   (let* ((initial-file (buffer-file-name))
          (initial-slug (file-name-base initial-file))
@@ -119,25 +119,25 @@ the current file"
     (find-file new-file)))
 
 ;; Useful notes functions
-(defun org-roam-insert-time-note(&optional goto)
+(defun dendroam-insert-time-note(&optional goto)
   "Creates a time note in the current level of the hierarchy.
 Time notes have the format: current.Y.m.d.MS3N
-The file is created using a template from `org-roam-utils-capture-templates'"
+The file is created using a template from `dendroam-utils-capture-templates'"
   (interactive "P")
   (org-roam-capture- :goto (when goto '(4))
                      :node (org-roam-node-create)
-                     :templates org-roam-utils-capture-templates
+                     :templates dendroam-utils-capture-templates
                      :keys "t"
                      :props (list :default-time (current-time))))
 
-(defun org-roam-insert-scratch-note(&optional goto)
+(defun dendroam-insert-scratch-note(&optional goto)
   "Creates a time note in the current level of the hierarchy.
 Time notes have the format: current.Y.m.d.MS3N
-The file is created using a template from `org-roam-utils-capture-templates'"
+The file is created using a template from `dendroam-utils-capture-templates'"
   (interactive "P")
   (org-roam-capture- :goto (when goto '(4))
                      :node (org-roam-node-create)
-                     :templates org-roam-utils-capture-templates
+                     :templates dendroam-utils-capture-templates
                      :keys "s"
                      :props (list :default-time (current-time))))
 
