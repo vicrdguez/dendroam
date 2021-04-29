@@ -87,10 +87,10 @@ with Org Roam
 ** Refactor hierarchies
 Useful to move group of files to another hierarchy.
 
-- Running ~org-roam-refactor-hierarchy~ will prompt you with the current file
+- Running ~dendroam-refactor-hierarchy~ will prompt you with the current file
   hierarchy so you can change it. This will refactor all the notes that share
   the same hierarchy as well
-- Running ~org-roam-refactor-file~ will do the same as refactor hierarchy command
+- Running ~dendroam-refactor-file~ will do the same as refactor hierarchy command
   but will change only the current file.
 
  [[file:assets/org-roam-refactor.gif]]
@@ -158,20 +158,19 @@ An example dailies configuration that works with hierarchies:
 #+end_src
 
 To allow scratch notes and time notes you need to configure a new variable
-defined in the dendroam code called ~org-roam-utils-capture-template~, that adds
+defined in the dendroam code called ~dendroam-capture-template~, that adds
 more templates:
 
 #+begin_src emacs-lisp
-(setq org-roam-utils-capture-templates
+(setq dendroam-capture-templates
       '(("t" "Time note" entry
          "* %?"
          :if-new (file+head "${current-file}.%<%Y.%m.%d>.org"
-                            "#+title: %<%Y-%m-%d>\n"))
+                            "#+title: %^{title}\n"))
         ("s" "Scratch note" entry
          "* %?"
          :if-new (file+head "scratch.%<%Y.%m.%d.%.%M%S%3N>.org"
-                            "#+title: %<%M%S%3N>\n"))
-        ))
+                            "#+title: %^{title}\n"))))
 #+end_src
 
 If you want to show the current file hierarchy as an initial input when running
@@ -179,7 +178,7 @@ the find command, you can use this function and then bind it to a key
 combination of your choice
 
 #+begin_src emacs-lisp
-(defun org-roam-node-find-initial-input ()
+(defun dendroam-node-find-initial-input ()
   (interactive)
   (org-roam-node-find nil (if (buffer-file-name)
                          (file-name-base (buffer-file-name))
