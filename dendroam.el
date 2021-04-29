@@ -37,11 +37,11 @@
 or sratch notes")
 
 ;;Node custom getters
-(cl-defmethod dendroam-node-current-file (node)
+(cl-defmethod org-roam-node-current-file (node)
   "Gets node file-name-base by file name"
   (file-name-base (org-roam-node-file node)))
 
-(cl-defmethod dendroam-node-hierarchy-title (node)
+(cl-defmethod org-roam-node-hierarchy-title (node)
   "Gets node title excluding the hierarchy and capitalize it"
   (capitalize
    (car
@@ -63,7 +63,7 @@ returns this.is.a.hierarchy"
   "Gets node hierarchy by file name"
   (funcall 'dendroam-format-hierarchy (org-roam-node-file node)))
 
-(cl-defmethod dendroam-node-current-file (node)
+(cl-defmethod org-roam-node-current-file (node)
   (file-name-base (buffer-file-name)))
 
 ;; Refactor functions
