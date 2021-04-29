@@ -59,7 +59,7 @@ returns this.is.a.hierarchy"
          (hierarchy-no-title (file-name-base base-name)))
     hierarchy-no-title))
 
-(cl-defmethod dendroam-node-hierarchy (node)
+(cl-defmethod org-roam-node-hierarchy (node)
   "Gets node hierarchy by file name"
   (funcall 'dendroam-format-hierarchy (org-roam-node-file node)))
 
