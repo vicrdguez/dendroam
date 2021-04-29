@@ -23,7 +23,7 @@
 
 (provide 'dendroam)
 
-(defvar org-roam-utils-capture-templates
+(defvar dendroam-capture-templates
   '(("t" "Time note" entry
      "* %?"
      :if-new (file+head "${current-file}.%<%Y.%m.%d.%M%S%3N>.org"
@@ -122,22 +122,22 @@ the current file"
 (defun dendroam-insert-time-note(&optional goto)
   "Creates a time note in the current level of the hierarchy.
 Time notes have the format: current.Y.m.d.MS3N
-The file is created using a template from `dendroam-utils-capture-templates'"
+The file is created using a template from `dendroam-capture-templates'"
   (interactive "P")
   (org-roam-capture- :goto (when goto '(4))
                      :node (org-roam-node-create)
-                     :templates dendroam-utils-capture-templates
+                     :templates dendroam-capture-templates
                      :keys "t"
                      :props (list :default-time (current-time))))
 
 (defun dendroam-insert-scratch-note(&optional goto)
   "Creates a time note in the current level of the hierarchy.
 Time notes have the format: current.Y.m.d.MS3N
-The file is created using a template from `dendroam-utils-capture-templates'"
+The file is created using a template from `dendroam-capture-templates'"
   (interactive "P")
   (org-roam-capture- :goto (when goto '(4))
                      :node (org-roam-node-create)
-                     :templates dendroam-utils-capture-templates
+                     :templates dendroam-capture-templates
                      :keys "s"
                      :props (list :default-time (current-time))))
 
