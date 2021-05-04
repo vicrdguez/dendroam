@@ -214,7 +214,7 @@ This registers ~dendroam~ as a package to use in doom. Now inside of ~.doom.d/co
 
 #+begin_src emacs-lisp
 (use-package! dendroam
-  :after org)
+  :after org-roam)
 #+end_src
 
 * Future plans
