@@ -120,7 +120,8 @@ the current file"
 
 ;; Useful notes functions
 (defun dendroam-insert-time-note(&optional goto)
-  "Creates a time note in the current level of the hierarchy.
+  "Create a time note in the current level of the hierarchy.
+GOTO is an `org-capture' parameter.
 Time notes have the format: current.Y.m.d.MS3N
 The file is created using a template from `dendroam-capture-templates'"
   (interactive "P")
@@ -131,7 +132,8 @@ The file is created using a template from `dendroam-capture-templates'"
                      :props (list :default-time (current-time))))
 
 (defun dendroam-insert-scratch-note(&optional goto)
-  "Creates a time note in the current level of the hierarchy.
+  "Create a time note in the current level of the hierarchy.
+GOTO is an `org-capture' parameter.
 Time notes have the format: current.Y.m.d.MS3N
 The file is created using a template from `dendroam-capture-templates'"
   (interactive "P")
@@ -141,6 +143,22 @@ The file is created using a template from `dendroam-capture-templates'"
                      :keys "s"
                      :props (list :default-time (current-time))))
 
+
+(defun dendroam-node-find ()
+  "Run completions with the current note as an initual input."
+  (interactive)
+  (org-roam-node-find nil (if (buffer-file-name)
+                              (file-name-base (buffer-file-name))
+                            "")))
+
+(defun dendroam-node-find-siblings ()
+  "Run completions showing all the siblings of the current note.
+The initial input is the direct parent of the current note"
+  (interactive)
+  (org-roam-node-find nil (if (buffer-file-name)
+                              (file-name-base
+                               (file-name-base (buffer-file-name)))
+                            "")))
 ;; Org roam overrides to allow these features
 (eval-after-load "org-roam"
   '(cl-defmethod org-roam-node-slug ((node org-roam-node))
