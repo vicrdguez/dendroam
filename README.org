@@ -217,6 +217,15 @@ This registers ~dendroam~ as a package to use in doom. Now inside of ~.doom.d/co
   :after org-roam)
 #+end_src
 
+** Emacs
+
+*** straight.el
+
+#+begin_src emacs-lisp
+(use-package dendroam
+  :straight (:host github :repo "vicrdguez/dendroam" :after org-roam))
+#+end_src
+
 * Future plans
 This code is something I use my self so I plan to keep improving it. This are
 the things I have in my mind now.
